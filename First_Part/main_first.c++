@@ -7,13 +7,13 @@ using namespace std;
 
 void menuOutput();
 bool isCorrect(int length);
+bool isInIndexesArray(int* indexesArray, int length, int chosenIndex);
 void fillArray(string* array, int length);
 void outputArray(string* array, int* indexesArray, int length, string option);
 void findIndex(string* array, int* indexesArray, int length, string option);
 int n;
 void insertion(string* array, int* indexesArray, int length, string option, int chosenIndex);
 void removal(string* array, int* indexesArray, int length, string option, int chosenIndex);
-
 
 void menuOutput() {
 	cout << "Практическое задание №1 ИКБО-03-21 Насевич В.В.\n"
@@ -31,6 +31,15 @@ void menuOutput() {
 
 bool isCorrect(int length) {
 	return (0 < length && length <= maxArrayLength) ? true : false;
+}
+
+bool isInIndexesArray(int* indexesArray, int length, int chosenIndex) {
+	for (size_t i = 0; i < length; i++) {
+		if (indexesArray[i] == chosenIndex) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void fillArray(string* array, int length) {
@@ -252,22 +261,26 @@ int main() {
 				if (option == 1) {
 					removal(array, indexesArray, actualArrayLength, "all");
 					actualArrayLength -= n;
-					cout << "\nФинальный вид массива:\n";
-					outputArray(array, indexesArray, actualArrayLength, "elements");
 				}
 				else if (option == 2) {
 					cout << "\nВыберите индекс элемента, который хотите удалить:\n";
 					int chosenIndex = -1;
 					cin >> chosenIndex;
-					removal(array, indexesArray, actualArrayLength, "one", chosenIndex);
-					actualArrayLength--;
-					cout << "\nФинальный вид массива:\n";
-					outputArray(array, indexesArray, actualArrayLength, "elements");
+					if (isInIndexesArray(indexesArray, n, chosenIndex)) {
+						removal(array, indexesArray, actualArrayLength, "one", chosenIndex);
+						actualArrayLength--;
+					}
+					else {
+						cout << "\nНекорректный ввод. Попробуйте ещё раз.\n";
+						break;
+					}
 				}
 				else {
 					cout << "\nНекорректный ввод. Попробуйте ещё раз\n";
 					break;
 				}
+				cout << "\nФинальный вид массива:\n";
+				outputArray(array, indexesArray, actualArrayLength, "elements");
 			}
 			else {
 				cout << "\nВ массиве нет искомых элементов.\n";

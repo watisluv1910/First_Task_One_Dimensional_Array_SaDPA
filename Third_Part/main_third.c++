@@ -1,20 +1,18 @@
 ﻿#include <iostream>
 #include <locale.h>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 void menuOutput();
 bool isCorrect(int length);
-bool isInIndexesArray(int* indexesArray, int length, int chosenIndex);
-void fillArray(string* array, int length);
-void outputArray(string* array, int* indexesArray, int length, string option);
-int* findIndex(string* array, int* indexesArray, int length, string option);
-int n;
-void insertion(string* array, int* indexesArray, int length, string option, int chosenIndex);
-void removal(string* array, int* indexesArray, int length, string option, int chosenIndex);
-string* resizeString(string* array, int actualArrayLength, int extensionsNumber);
-int* resizeInt(int* indexesArray, int actualArrayLength, int extensionsNumber);
+void fillArray(vector<string>& array);
+bool isInIndexesArray(vector<int>& indexesArray, int chosenIndex);
+void outputArray(vector<string>& array, vector<int>& indexesArray, string option);
+void findIndex(vector<string>& array, vector<int>& indexesArray, string option);
+void insertion(vector<string>& array, vector<int>& indexesArray, string option, int chosenIndex);
+void removal(vector<string>& array, vector<int>& indexesArray, string option, int chosenIndex);
 
 void menuOutput() {
 	cout << "Практическое задание №1 ИКБО-03-21 Насевич В.В.\n"
@@ -34,141 +32,92 @@ bool isCorrect(int length) {
 	return (0 < length && length <= numeric_limits<int>::max()) ? true : false;
 }
 
-bool isInIndexesArray(int* indexesArray, int length, int chosenIndex) {
-	for (size_t i = 0; i < length; i++) {
-		if (indexesArray[i] == chosenIndex) {
+void fillArray(vector<string> &array) {
+	for (auto& element: array) {
+		cin >> element;
+	}
+}
+
+bool isInIndexesArray(vector<int>& indexesArray, int chosenIndex) {
+	for (auto& element: indexesArray) {
+		if (element == chosenIndex) {
 			return true;
 		}
 	}
 	return false;
 }
 
-void fillArray(string* array, int length) {
-	for (size_t i = 0; i < length; i++) {
-		cin >> array[i];
-	}
-}
-
-void outputArray(string* array, int* indexesArray, int length, string option) {
+void outputArray(vector<string>& array, vector<int>& indexesArray, string option) {
 	if (option == "elements") {
-		for (size_t i = 0; i < length; i++) {
-			cout << i + 1 << ". " << array[i] << endl;
+		for (size_t i = 0; i < array.size(); i++) {
+			cout << i + 1 << ". " << array.at(i) << endl;
 		}
 	}
 	else {
-		for (size_t i = 0; i < length; i++) {
-			cout << i + 1 << ". " << indexesArray[i] << endl;
+		for (size_t i = 0; i < indexesArray.size(); i++) {
+			cout << i + 1 << ". " << indexesArray.at(i) << endl;
 		}
 	}
 }
 
-int* findIndex(string* array, int* indexesArray, int length, string option) {
-	n = 0;
-	for (size_t i = 0; i < length; i++) {
-		if (array[i].find("0") != string::npos && option == "with_zero" 
+void findIndex(vector<string>& array, vector<int>& indexesArray, string option) {
+	indexesArray.clear();
+	for (size_t i = 0; i < array.size(); i++) {
+		if (array[i].find("0") != string::npos && option == "with_zero"
 			|| array[i].find("0") == string::npos && option == "without_zero") {
-			indexesArray = resizeInt(indexesArray, n, 1);
-			indexesArray[n] = i;
-			n++;
+			indexesArray.push_back(i);
 		}
 	}
-	return indexesArray;
 }
 
 // chosenIndex is necessery only with option "one"
-void insertion(string* array, int* indexesArray, int length, string option, int chosenIndex = -1) {
+void insertion(vector<string>& array, vector<int>& indexesArray, string option, int chosenIndex = -1) {
 	string addition;
 	if (option == "one") {
 		cin >> addition;
 		if (chosenIndex == -1) {
-			for (size_t i = length - 1; i >= indexesArray[0]; i--) {
-				array[i + 1] = array[i];
-			}
-			array[indexesArray[0] + 1] = addition;
+			/*array.push_back(addition);
+			swap(array.at(indexesArray.at(0) + 1), array.back());*/
+			array.insert(array.begin() + indexesArray.at(0) + 1, addition);
 		}
 		else {
-			for (size_t i = length - 1; i >= chosenIndex; i--) {
-				array[i + 1] = array[i];
-			}
-			array[chosenIndex + 1] = addition;
+			array.insert(array.begin() + chosenIndex + 1, addition);
 		}
 	}
 	else {
-		for (size_t i = 0; i < n; i++) {
+		for (size_t i = 0; i < indexesArray.size(); i++) {
 			cin >> addition;
-			int j = length - 1;
-			while (j >= indexesArray[i]) {
-				array[j + 1] = array[j];
-				j--;
-			}
-			array[indexesArray[i] + 1] = addition;
-			length++;
-			for (size_t k = i + 1; k < n; k++) {
-				indexesArray[k]++;
+			array.insert(array.begin() + indexesArray.at(i) + 1, addition);;
+			for (size_t k = i + 1; k < indexesArray.size(); k++) {
+				indexesArray.at(k)++;
 			}
 		}
 	}
 }
 
-void removal(string* array, int* indexesArray, int length, string option, int chosenIndex = -1) {
+void removal(vector<string>& array, vector<int>& indexesArray, string option, int chosenIndex = -1) {
 	if (option == "one") {
 		if (chosenIndex == -1) {
-			for (size_t i = indexesArray[0]; i < length - 1; i++) {
-				array[i] = array[i + 1];
-			}
+			array.erase(array.begin() + indexesArray.at(0));
 		}
 		else {
-			for (size_t i = chosenIndex; i < length - 1; i++) {
-				array[i] = array[i + 1];
-			}
+			array.erase(array.begin() + chosenIndex);
 		}
 	}
 	else {
-		for (size_t i = 0; i < n; i++) {
-			int j = indexesArray[i];
-			while (j < length - 1) {
-				array[j] = array[j + 1];
-				j++;
-			}
-			length--;
-			for (size_t k = i + 1; k < n; k++) {
-				indexesArray[k]--;
+		for (size_t i = 0; i < indexesArray.size(); i++) {
+			array.erase(array.begin() + indexesArray.at(i));
+			for (size_t k = i + 1; k < indexesArray.size(); k++) {
+				indexesArray.at(k)--;
 			}
 		}
 	}
-}
-
-string* resizeString(string* array, int actualArrayLength, int extensionsNumber) {
-	long newArrayLength = actualArrayLength + extensionsNumber;
-	string* extendedArray = new string[newArrayLength];
-	if (newArrayLength >= actualArrayLength) {
-		for (int i = 0; i < actualArrayLength; i++) {
-			extendedArray[i] = array[i];
-		}
-	}
-	else {
-		for (int i = 0; i < newArrayLength; i++) {
-			extendedArray[i] = array[i];
-		}
-	}
-	delete[] array;
-	return extendedArray;
-}
-
-int* resizeInt(int* indexesArray, int actualArrayLength, int extensionsNumber) {
-	long newArrayLength = actualArrayLength + extensionsNumber;
-	int* extendedIndexesArray = new int[newArrayLength];
-	for (int i = 0; i < actualArrayLength; i++) {
-		extendedIndexesArray[i] = indexesArray[i];
-	}
-	delete[] indexesArray;
-	return extendedIndexesArray;
 }
 
 int main() {
 	setlocale(LC_ALL, "Russian");
-	string* array = new string [0];
-	int* indexesArray = new int [0];
+	vector<string> array;
+	vector<int> indexesArray;
 	int actualArrayLength = 0, chooseTask = 0;
 	menuOutput();
 	cout << "\nВаш выбор:\n";
@@ -180,9 +129,9 @@ int main() {
 				"*Не меньше 1 (единицы):\n";
 			cin >> actualArrayLength;
 			if (isCorrect(actualArrayLength)) {
-				array = resizeString(array, 0, actualArrayLength); //extenction
+				array.resize(actualArrayLength);
 				cout << "\nВведите элементы массива через Enter или Space:\n";
-				fillArray(array, actualArrayLength);
+				fillArray(array);
 			}
 			else {
 				cout << "\nКоличество элементов массива введено некорректно. "
@@ -192,25 +141,25 @@ int main() {
 		}
 		case 2: { // array output
 			cout << "\nВывод элементов массива:\n";
-			if (actualArrayLength <= 0) {
+			if (array.size() <= 0) {
 				cout << "\nМассив пуст.\n";
 			}
 			else {
-				outputArray(array, indexesArray, actualArrayLength, "elements");
+				outputArray(array, indexesArray, "elements");
 			}
 			break;
 		}
 		case 3: { // find without 0
-			indexesArray = findIndex(array, indexesArray, actualArrayLength, "with_zero");
-			if (n == 1) {
+			findIndex(array, indexesArray, "with_zero");
+			if (indexesArray.size() == 1) {
 				cout << "\nИндекс элемента массива, "
 					"значение которого содержит цифру 0:\n"
 					<< indexesArray[0] << endl;
 			}
-			else if (n > 1) {
+			else if (indexesArray.size() > 1) {
 				cout << "\nИндексы элементов массива, "
 					"значение которых содержит цифру 0:\n";
-				outputArray(array, indexesArray, n, "indexes");
+				outputArray(array, indexesArray, "indexes");
 			}
 			else {
 				cout << "\nВ массиве нет искомых элементов.\n";
@@ -218,44 +167,40 @@ int main() {
 			break;
 		}
 		case 4: { // insert
-			indexesArray = findIndex(array, indexesArray, actualArrayLength, "without_zero");
-			if (n == 1) {
+			findIndex(array, indexesArray, "without_zero");
+			if (indexesArray.size() == 1) {
 				cout << "\nИндекс элемента массива, значение "
 					"которого не содержит цифру 0:\n"
-					<< indexesArray[0] << endl;
-				array = resizeString(array, actualArrayLength, 1);
+					<< indexesArray.at(0) << endl;
 				cout << "\nВведите число, которое хотите вставить в массив:\n";
-				insertion(array, indexesArray, actualArrayLength, "one");
-				actualArrayLength++;
+				insertion(array, indexesArray, "one");
 				cout << "\nФинальный вид массива:\n";
-				outputArray(array, indexesArray, actualArrayLength, "elements");
+				outputArray(array, indexesArray, "elements");
 			}
-			else if (n > 1) {
+			else if (indexesArray.size() > 1) {
 				cout << "\nИндексы элементов массива, значение "
 					"которых не содержит цифру 0:\n";
-				outputArray(array, indexesArray, n, "indexes");
+				outputArray(array, indexesArray, "indexes");
 				int option = 0;
 				cout << "\nЕсли хотите выполнить вставку после всех "
 					"найденных элементов, введите 1.\nЕсли хотите выполнить "
 					"вставку после конкретного элемента, введите 2.\n";
 				cin >> option;
 				if (option == 1) {
-					array = resizeString(array, actualArrayLength, n);
-					insertion(array, indexesArray, actualArrayLength, "all");
-					actualArrayLength += n;
+					cout << "\nВведите числа, которое хотите вставить в массив:\n";
+					insertion(array, indexesArray, "all");
 					cout << "\nФинальный вид массива:\n";
-					outputArray(array, indexesArray, actualArrayLength, "elements");
+					outputArray(array, indexesArray, "elements");
 				}
 				else if (option == 2) {
 					cout << "\nВыберите номер индекса элемента, "
 						"после которого хотите вставить новый:\n";
 					int chosenIndex = -1;
 					cin >> chosenIndex;
-					array = resizeString(array, actualArrayLength, 1);
-					insertion(array, indexesArray, actualArrayLength, "one", chosenIndex);
-					actualArrayLength++;
+					cout << "\nВведите число, которое хотите вставить в массив:\n";
+					insertion(array, indexesArray, "one", chosenIndex);
 					cout << "\nФинальный вид массива:\n";
-					outputArray(array, indexesArray, actualArrayLength, "elements");
+					outputArray(array, indexesArray, "elements");
 				}
 				else {
 					cout << "\nНекорректный ввод. Попробуйте ещё раз.\n";
@@ -268,41 +213,35 @@ int main() {
 			break;
 		}
 		case 5: { // delete with 0
-			indexesArray = findIndex(array, indexesArray, actualArrayLength, "with_zero");
-			if (n == 1) {
+			findIndex(array, indexesArray, "with_zero");
+			if (indexesArray.size() == 1) {
 				cout << "\nИндекс элемента массива, значение "
 					"которого содержит цифру 0:\n"
-					<< indexesArray[0] << endl;
+					<< indexesArray.at(0) << endl;
 				cout << "\nЭлемент массива, который будет удалён:\n"
-					<< array[indexesArray[0]] << endl;
-				removal(array, indexesArray, actualArrayLength, "one");
-				array = resizeString(array, actualArrayLength, -1);
-				actualArrayLength--;
+					<< array.at(indexesArray.at(0)) << endl;
+				removal(array, indexesArray, "one");
 				cout << "\nФинальный вид массива:\n";
-				outputArray(array, indexesArray, actualArrayLength, "elements");
+				outputArray(array, indexesArray, "elements");
 			}
-			else if (n > 1) {
+			else if (indexesArray.size() > 1) {
 				cout << "\nИндексы элементов массива, значение "
 					"которых содержит цифру 0:\n";
-				outputArray(array, indexesArray, n, "indexes");
+				outputArray(array, indexesArray, "indexes");
 				int option = 0;
 				cout << "\nЕсли хотите выполнить удаление всех "
 					"найденных элементов, введите 1.\nЕсли хотите выполнить "
 					"удаление конкретного элемента, введите 2.\nВаш выбор:\n";
 				cin >> option;
 				if (option == 1) {
-					removal(array, indexesArray, actualArrayLength, "all");
-					array = resizeString(array, actualArrayLength, (-1)*n);
-					actualArrayLength -= n;
+					removal(array, indexesArray, "all");
 				}
 				else if (option == 2) {
 					cout << "\nВыберите индекс элемента, который хотите удалить:\n";
 					int chosenIndex = -1;
-					cin >> chosenIndex; 
-					if (isInIndexesArray(indexesArray, n, chosenIndex)) {
-						removal(array, indexesArray, actualArrayLength, "one", chosenIndex);
-						array = resizeString(array, actualArrayLength, -1);
-						actualArrayLength--;
+					cin >> chosenIndex;
+					if (isInIndexesArray(indexesArray, chosenIndex)) {
+						removal(array, indexesArray, "one", chosenIndex);
 					}
 					else {
 						cout << "\nНекорректный ввод. Попробуйте ещё раз.\n";
@@ -310,11 +249,11 @@ int main() {
 					}
 				}
 				else {
-					cout << "\nНекорректный ввод. Попробуйте ещё раз\n";
+					cout << "\nНекорректный ввод. Попробуйте ещё раз.\n";
 					break;
 				}
 				cout << "\nФинальный вид массива:\n";
-				outputArray(array, indexesArray, actualArrayLength, "elements");
+				outputArray(array, indexesArray, "elements");
 			}
 			else {
 				cout << "\nВ массиве нет искомых элементов.\n";
