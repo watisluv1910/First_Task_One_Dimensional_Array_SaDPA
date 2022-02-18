@@ -104,12 +104,12 @@ void insertion(string* array, int* indexesArray, int length, string option, int 
 void removal(string* array, int* indexesArray, int length, string option, int chosenIndex = -1) {
 	if (option == "one") {
 		if (chosenIndex == -1) {
-			for (size_t i = indexesArray[0]; i < length; i++) {
+			for (size_t i = indexesArray[0]; i < length - 1; i++) {
 				array[i] = array[i + 1];
 			}
 		}
 		else {
-			for (size_t i = chosenIndex; i < length; i++) {
+			for (size_t i = chosenIndex; i < length - 1; i++) {
 				array[i] = array[i + 1];
 			}
 		}
@@ -117,7 +117,7 @@ void removal(string* array, int* indexesArray, int length, string option, int ch
 	else {
 		for (size_t i = 0; i < n; i++) {
 			int j = indexesArray[i];
-			while (j < length) {
+			while (j < length - 1) {
 				array[j] = array[j + 1];
 				j++;
 			}
